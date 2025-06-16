@@ -17,6 +17,7 @@ execute:
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(ggthemes)
 
 # An R Package to work with model outputs
 
@@ -44,6 +45,10 @@ global_waste_data <- read_csv(here::here("data/country_level_data_0.csv"))
 # Data tidying
 
 ## Waste data
+
+-   Ctrl / Cmd + Enter: to run code bit by bit
+
+-   
 
 ```{r}
 
@@ -93,11 +98,42 @@ Main aesthetic mappings:
 -   size
 -   alpha (Transparency)
 
+```{r}
+ggplot(data = global_waste_data_kg_year,
+       mapping = aes(x = gdp,
+                     y = capita_kg_year,
+                     color = income_id,
+                     shape = income_id)) +
+  geom_point()
+```
+
+-   Pipe: Ctrl / Cmd + Shift + M
+
+```{r}
+global_waste_data_kg_year |>
+  filter(is.na(capita_kg_year))
+
+global_waste_data_kg_year |> 
+  filter(is.na(gdp))
+```
+
 ## Scaling
 
 All functions that adapt the scale start with `scale_` followed by the aesthetic to be adapted, e.g. `x_`, and then followed by the type of variable, e.g. `continouous`. So to adapt a continuous scale on an x-axis, the function to use is: `scale_x_continuous()`
 
 ### Axis scales
+
+```{r}
+ggplot(data = global_waste_data_kg_year,
+       mapping = aes(x = gdp,
+                     y = capita_kg_year,
+                     color = income_id,
+                     shape = income_id)) +
+  geom_point() +
+  scale_y_continuous(breaks = seq(0, 1400, 200), limits = c(0, 1400)) +
+  scale_x_log10(labels = scales::label_log())
+  
+```
 
 ### Color scales
 
@@ -105,13 +141,34 @@ All functions that adapt the scale start with `scale_` followed by the aesthetic
 
 ```{r}
 
+ggplot(data = global_waste_data_kg_year,
+       mapping = aes(x = gdp,
+                     y = capita_kg_year,
+                     color = income_id,
+                     shape = income_id)) +
+  geom_point() +
+  scale_y_continuous(breaks = seq(0, 1400, 200), limits = c(0, 1400)) +
+  scale_x_log10(labels = scales::label_log()) +
+  scale_color_colorblind()
 ```
 
 -   scale_color_manual()
+-   Copy: Ctrl/Cmd + C
+-   Paste: Ctrl/Cmd + V
 
 ```{r}
 
 my_colors <- c("#ED6D37", "#901C6C", "#18A5C5", "#A6CE8F")
+
+ggplot(data = global_waste_data_kg_year,
+       mapping = aes(x = gdp,
+                     y = capita_kg_year,
+                     color = income_id,
+                     shape = income_id)) +
+  geom_point() +
+  scale_y_continuous(breaks = seq(0, 1400, 200), limits = c(0, 1400)) +
+  scale_x_log10(labels = scales::label_log()) +
+  scale_color_manual(values = my_colors)
 
 
 ```
@@ -134,6 +191,15 @@ ggplot(data = global_waste_data_kg_year,
   scale_y_continuous(breaks = seq(0, 1400, 200), limits = c(0, 1400)) +
 
   scale_color_manual(values = my_colors)
+
+
+
+ggplot(data = global_waste_data_kg_year,
+       mapping = aes(x = gdp,
+                     y = capita_kg_year)) +
+  geom_point(mapping = aes(color = income_id)) +
+  geom_smooth(method = "lm", se = FALSE)
+
 
 ```
 
@@ -214,6 +280,8 @@ https://broom.tidymodels.org/articles/broom.html
 
 lmfit <- lm(capita_kg_year ~ gdp, data = global_waste_data_kg_year)
 
+lmfit
+
 summary(lmfit)
 
 tidy(lmfit) |> 
@@ -221,8 +289,6 @@ tidy(lmfit) |>
 
 glance(lmfit) |> 
   knitr::kable(digits = 2)
-
-
 
 ```
 
